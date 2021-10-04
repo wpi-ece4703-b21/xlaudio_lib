@@ -50,18 +50,18 @@ typedef void     (*xlaudio_buffer_process_t)(uint16_t *, uint16_t *);
 
 void xlaudio_init();
 
-void xlaudio_init_poll(XLAUDIO_IN_enum_t  _audioin,
+void xlaudio_init_poll(xlaudio_in_enum_t  _audioin,
                        xlaudio_sample_process_t _cb
                        );
 
-void xlaudio_init_intr(FS_enum_t          _fs,
-                       XLAUDIO_IN_enum_t  _audioin,
+void xlaudio_init_intr(fs_enum_t          _fs,
+                       xlaudio_in_enum_t  _audioin,
                        xlaudio_sample_process_t _cb
                        );
 
-void xlaudio_init_dma (FS_enum_t          _fs,
-                       XLAUDIO_IN_enum_t  _audioin,
-                       BUFLEN_enum_t      _pplen,
+void xlaudio_init_dma (fs_enum_t          _fs,
+                       xlaudio_in_enum_t  _audioin,
+                       buflen_enum_t      _pplen,
                        xlaudio_buffer_process_t _cb
                        );
 

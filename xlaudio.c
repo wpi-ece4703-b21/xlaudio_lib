@@ -57,7 +57,7 @@ xlaudio_buffer_process_t glbBufferCallback = 0;
 
 void blockingerror();
 
-void initMic(XLAUDIO_IN_enum_t input) {
+void initMic(xlaudio_in_enum_t input) {
     if (input == XLAUDIO_MIC_IN) {
         GPIO_setAsPeripheralModuleFunctionInputPin(MIC_INPUT_PORT,
                                                    MIC_INPUT_PIN,
@@ -198,17 +198,18 @@ int xlaudio_pushButtonRightUp() {
 }
 
 void blockingerror() {
+    volatile int i;
     while (1) {
         xlaudio_errorledon();
-        __delay_cycles(12000000);
+        for (i=0; i<500000; i++) ;
         xlaudio_errorledoff();
-        __delay_cycles(12000000);
+        for (i=0; i<500000; i++) ;
     }
 }
 
 Timer_A_PWMConfig glbPWMConfig;
 
-void configureSampleclock(FS_enum_t fs) {
+void configureSampleclock(fs_enum_t fs) {
     uint_fast16_t ccrvalue[8] = {
           6000,
           4354,
@@ -235,7 +236,7 @@ void configureSampleclock(FS_enum_t fs) {
     }
 }
 
-void configureBuffer(BUFLEN_enum_t      _pplen) {
+void configureBuffer(buflen_enum_t      _pplen) {
 
    uint16_t buflen[] = {8, 16, 32, 64, 128};
    uint16_t k;
@@ -262,7 +263,7 @@ void stopSampleClock() {
 
 static DMA_ControlTable  dmaControlTable[32];
 
-void initADC(XLAUDIO_IN_enum_t  _audioin) {
+void initADC(xlaudio_in_enum_t  _audioin) {
 
     ADC14_enableModule();
     ADC14_initModule(ADC_CLOCKSOURCE_MCLK, // 48MHz conversion rate
@@ -408,7 +409,7 @@ void xlaudio__init() {
     initClock();
 }
 
-void xlaudio__init_poll(XLAUDIO_IN_enum_t  _audioin,
+void xlaudio__init_poll(xlaudio_in_enum_t  _audioin,
                         xlaudio_sample_process_t _cb
                         ) {
     glbIO = io_poll;
@@ -430,8 +431,8 @@ void xlaudio__init_poll(XLAUDIO_IN_enum_t  _audioin,
     initADC(_audioin);
 }
 
-void xlaudio_init_intr(FS_enum_t          _fs,
-                       XLAUDIO_IN_enum_t  _audioin,
+void xlaudio_init_intr(fs_enum_t          _fs,
+                       xlaudio_in_enum_t  _audioin,
                        xlaudio_sample_process_t _cb
                        ) {
     glbIO = io_intr;
@@ -454,9 +455,9 @@ void xlaudio_init_intr(FS_enum_t          _fs,
     initADC(_audioin);
 }
 
-void xlaudio_init_dma (FS_enum_t          _fs,
-                       XLAUDIO_IN_enum_t  _audioin,
-                       BUFLEN_enum_t      _pplen,
+void xlaudio_init_dma (fs_enum_t          _fs,
+                       xlaudio_in_enum_t  _audioin,
+                       buflen_enum_t      _pplen,
                        xlaudio_buffer_process_t _cb
                        ) {
     glbIO = io_dma;
