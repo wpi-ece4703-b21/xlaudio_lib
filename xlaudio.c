@@ -400,7 +400,19 @@ void ADC14_IRQHandler(void) {
 
 }
 
-void xlaudio__init() {
+void initTimer32() {
+    Timer32_initModule(TIMER32_0_BASE,          // fpr performance evaluation
+                       TIMER32_PRESCALER_1,
+                       TIMER32_32BIT,
+                       TIMER32_FREE_RUN_MODE);
+    Timer32_initModule(TIMER32_1_BASE,          // for software delays
+                       TIMER32_PRESCALER_1,
+                       TIMER32_32BIT,
+                       TIMER32_FREE_RUN_MODE);
+}
+
+void xlaudio_init() {
+    initTimer32();
     dutypininit();
     debugpininit();
     errorledinit();
@@ -416,6 +428,7 @@ void xlaudio__init_poll(xlaudio_in_enum_t  _audioin,
     glbBUFLEN = 1;
     glbSampleCallback = _cb;
 
+    initTimer32();
     dutypininit();
     debugpininit();
     errorledinit();
@@ -439,6 +452,7 @@ void xlaudio_init_intr(fs_enum_t          _fs,
     glbBUFLEN = 1;
     glbSampleCallback = _cb;
 
+    initTimer32();
     dutypininit();
     debugpininit();
     errorledinit();
@@ -464,6 +478,7 @@ void xlaudio_init_dma (fs_enum_t          _fs,
     configureBuffer(_pplen);
     glbBufferCallback = _cb;
 
+    initTimer32();
     dutypininit();
     debugpininit();
     errorledinit();
@@ -563,15 +578,20 @@ uint32_t median(uint32_t arr[N_MEASUREMENTS]) {
     return arr[N_MEASUREMENTS/2];
 }
 
+void xlaudio_delay(uint32_t cycles) {
+    uint32_t v;
+    Timer32_setCount(TIMER32_1_BASE, cycles);
+    Timer32_startTimer(TIMER32_1_BASE, false);
+    do {
+        v = Timer32_getValue(TIMER32_1_BASE);
+    } while (v < cycles);
+    Timer32_haltTimer(TIMER32_1_BASE);
+}
+
 uint32_t xlaudio_measurePerfSample(xlaudio_sample_process_t _cb) {
     uint32_t cycles[N_MEASUREMENTS];
     uint32_t overhead[N_MEASUREMENTS];
     uint32_t k;
-
-    Timer32_initModule(TIMER32_0_BASE,
-                       TIMER32_PRESCALER_1,
-                       TIMER32_32BIT,
-                       TIMER32_FREE_RUN_MODE);
 
     Timer32_startTimer(TIMER32_0_BASE, false);
 
@@ -595,11 +615,6 @@ uint32_t xlaudio_measurePerfBuffer(xlaudio_buffer_process_t _cb) {
     uint32_t cycles[N_MEASUREMENTS];
     uint32_t overhead[N_MEASUREMENTS];
     uint32_t k;
-
-    Timer32_initModule(TIMER32_0_BASE,
-                       TIMER32_PRESCALER_1,
-                       TIMER32_32BIT,
-                       TIMER32_FREE_RUN_MODE);
 
     Timer32_startTimer(TIMER32_0_BASE, false);
 

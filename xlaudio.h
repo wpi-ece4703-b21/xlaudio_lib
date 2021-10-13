@@ -86,4 +86,6 @@ int xlaudio_pushButtonLeftDown();
 int xlaudio_pushButtonRightUp();
 int xlaudio_pushButtonRightDown();
 
+void xlaudio_delay(uint32_t cycles);
+
 #endif /* XLAUDIO_H_ */
